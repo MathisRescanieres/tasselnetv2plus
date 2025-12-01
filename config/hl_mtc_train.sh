@@ -1,4 +1,6 @@
-CUDA_VISIBLE_DEVICES=0 python hltrainval.py \
+#!/bin/bash
+export CUDA_VISIBLE_DEVICES=""
+python hltrainval.py \
 --data-dir ./data/maize_counting_dataset \
 --dataset mtc \
 --model tasselnetv2plus \

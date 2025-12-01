@@ -158,13 +158,15 @@ def train(net, train_loader, criterion, optimizer, epoch, args):
     avg_frame_rate = 0.0
     in_sz = args.input_size
     os = args.output_stride
-    target_filter = torch.cuda.FloatTensor(1, 1, in_sz, in_sz).fill_(1)
+    target_filter = torch.ones(1, 1, in_sz, in_sz, device=device)
     for i, sample in enumerate(train_loader):
-        torch.cuda.synchronize()
+        if device.type == 'cuda':
+            torch.cuda.synchronize()
+
         start = time()
 
         inputs, targets = sample['image'], sample['target']
-        inputs, targets = inputs.cuda(), targets.cuda()
+        inputs, targets = inputs.to(device), targets.to(device)
         
         # zero the parameter gradients
         optimizer.zero_grad()
@@ -182,7 +184,9 @@ def train(net, train_loader, criterion, optimizer, epoch, args):
         # collect and print statistics
         running_loss += loss.item()
 
-        torch.cuda.synchronize()
+        if device.type == 'cuda':
+            torch.cuda.synchronize()
+
         end = time()
 
         running_frame_rate = args.batch_size * float(1 / (end - start))
@@ -218,12 +222,15 @@ def validate(net, valset, val_loader, criterion, epoch, args):
     with torch.no_grad():
         avg_frame_rate = 0.0
         for i, sample in enumerate(val_loader):
-            torch.cuda.synchronize()
+            if device.type == 'cuda':
+                torch.cuda.synchronize()
+
             start = time()
 
             image, gtcount = sample['image'], sample['gtcount']
             # inference
-            output = net(image.cuda(), is_normalize=not args.save_output)
+            image = image.to(device)
+            output = net(image, is_normalize=not args.save_output)
             if args.save_output:
                 output_save = output
                 # normalization
@@ -275,7 +282,9 @@ def validate(net, valset, val_loader, criterion, epoch, args):
             mse = compute_mse(pd_counts, gt_counts)
             rmae, rmse = compute_relerr(pd_counts, gt_counts)
 
-            torch.cuda.synchronize()
+            if device.type == 'cuda':
+                torch.cuda.synchronize()
+
             end = time()
             
             running_frame_rate = 1 * float(1 / (end - start))
@@ -352,14 +361,14 @@ def main():
     )
 
     net = nn.DataParallel(net)
-    net.cuda()
+    net.to(device)
     
     # filter parameters
     learning_params = [p[1] for p in net.named_parameters()]
     pretrained_params = []
 
     # define loss function and optimizer
-    criterion = nn.L1Loss(reduction='mean').cuda()
+    criterion = nn.L1Loss(reduction='mean').to(device)
 
     if args.optimizer == 'sgd':
         optimizer = torch.optim.SGD(
@@ -401,7 +410,7 @@ def main():
     }
     if args.restore_from is not None:
         if os.path.isfile(args.restore_from):
-            checkpoint = torch.load(args.restore_from)
+            checkpoint = torch.load(args.restore_from, map_location=torch.device('cpu'))
             net.load_state_dict(checkpoint['state_dict'])
             if 'epoch' in checkpoint:
                 start_epoch = checkpoint['epoch']

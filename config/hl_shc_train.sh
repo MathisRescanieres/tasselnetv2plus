@@ -1,4 +1,6 @@
-CUDA_VISIBLE_DEVICES=0 python hltrainval.py \
+#!/bin/bash
+export CUDA_VISIBLE_DEVICES=""
+python hltrainval.py \
 --data-dir ./data/sorghum_head_counting_dataset \
 --dataset shc \
 --model tasselnetv2plus \

@@ -89,3 +89,4 @@ epoch: 490, mae: 5.07, mse: 6.18, rmae: 3.83%, rmse: 4.71%, r2: 0.9177
 epoch: 500, mae: 7.57, mse: 8.95, rmae: 5.69%, rmse: 6.78%, r2: 0.9167
 best mae: 4.59, best mse: 5.66, best_rmae: 3.45, best_rmse: 4.24, best_r2: 0.9151
 overall best mae: 4.59, overall best mse: 5.66, overall best_rmae: 3.45, overall best_rmse: 4.24, overall best_r2: 0.9214
+epoch: 300, mae: 4.55, mse: 5.52, rmae: 3.43%, rmse: 4.15%, r2: 0.9180

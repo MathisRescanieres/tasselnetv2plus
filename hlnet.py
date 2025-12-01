@@ -106,8 +106,22 @@ class Normalizer:
     
     @staticmethod
     def gpu_normalizer(x, imh, imw, insz, os):
-        _, _, h, w = x.size()            
-        accm = torch.cuda.FloatTensor(1, insz*insz, h*w).fill_(1)           
+        """
+        Normalizer compatible CPU/GPU
+        """
+        device = x.device
+        _, _, h, w = x.size()
+
+        # CPU path
+        if device.type == 'cpu':
+            bs = x.size(0)
+            normx = np.zeros((imh, imw))
+            norm_vec = dense_sample2d(normx, insz, os).astype(np.float32)
+            x = x.cpu().detach().numpy().reshape(bs, -1) * norm_vec
+            return x
+
+        # GPU path
+        accm = torch.ones(1, insz*insz, h*w, device=device)
         accm = F.fold(accm, (imh, imw), kernel_size=insz, stride=os)
         accm = 1 / accm
         accm /= insz**2

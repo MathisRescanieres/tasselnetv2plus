@@ -89,3 +89,4 @@ epoch: 490, mae: 5.96, mse: 10.62, relerr: 30.87%, relerr10: 16.10%, r2: 0.8741
 epoch: 500, mae: 5.58, mse: 10.22, relerr: 29.42%, relerr10: 15.37%, r2: 0.8765
 best mae: 5.09, best mse: 9.06, best_relerr: 33.81, best_relerr10: 14.09, best_r2: 0.8880
 overall best mae: 5.09, overall best mse: 8.95, overall best_relerr: 28.17, overall best_relerr10: 14.09, overall best_r2: 0.9062
+epoch: 310, mae: 5.09, mse: 9.06, rmae: 33.81%, rmse: 79.12%, r2: 0.8880
